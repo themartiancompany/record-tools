@@ -64,13 +64,13 @@ _start() {
   )
   _conf="$( \
     _get_conf_path)"
-  write_setting \
+  _write_setting \
     "${_conf}" \
     "camera" \
     "mode" \
     "active"
   _set="$( \
-    read_setting \
+    _read_setting \
       "${_conf}" \
       "camera" \
       "mode")"
