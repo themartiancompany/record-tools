@@ -93,14 +93,17 @@ _service() {
     (( "${_time}" < "${_duration}" )); do
     activity-launch \
       "${_app}" \
-      "MainActivity"
+      "MainActivity" || \
+      true
     bbrightnessctl \
       -m \
         root \
       set \
-        0
+        0 || \
+      true
     touchctl \
-      disable
+      disable || \
+    true
     sleep \
       "${_poll}"
     _time="$(( \
