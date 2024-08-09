@@ -129,7 +129,7 @@ _service() {
       touchctl \
         status)"
     _msg_info \
-      "Current brightness: ${_brightness}"
+      "Current brightness: ${_current_brightness}"
     if \
       (( "1" <= "${_current_brightness}" )); then
       activity-launch \
