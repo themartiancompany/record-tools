@@ -142,8 +142,11 @@ _service() {
     _msg_info \
       "Target activity: ${_app}/${_app}.MainActivity"
     if [[ "${_current_activity}" != "${_app}/${_app}.MainActivity" ]]; then
-      echo \
-        "${_current_activity}"
+      activity-launch \
+        "${_camera_app_opts[@]}" \
+        "${_app}" \
+        "MainActivity" || \
+        true
     fi
     if \
       (( "1" <= "${_current_brightness}" )); then
