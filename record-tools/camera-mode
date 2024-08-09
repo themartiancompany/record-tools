@@ -129,7 +129,7 @@ _service() {
       disable || \
     true
     sleep \
-    ž  "${_poll}"
+      "${_poll}"
     _time="$(( \
       _time + _poll ))"
   done
