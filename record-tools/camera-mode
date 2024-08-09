@@ -139,7 +139,9 @@ _service() {
       "Current brightness: ${_current_brightness}"
     _msg_info \
       "Current activity: ${_current_activity}"
-    if [[ "${_current_activity}" != "${_app}/MainActivity" ]]; then
+    _msg_info \
+      "Target activity: ${_app}/${_app}.MainActivity"
+    if [[ "${_current_activity}" != "${_app}/${_app}.MainActivity" ]]; then
       echo \
         "${_current_activity}"
     fi
