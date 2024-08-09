@@ -21,7 +21,11 @@ _requirements() {
       -o)"
   if [[ "${_os}" == 'Android' ]]; then
     _check_cmd \
-      "activity-launch"
+      "activity-launch" \
+      "android-utils"
+    _check_cmd \
+      "activity-focused" \
+      "android-utils"
   fi
 }
 
