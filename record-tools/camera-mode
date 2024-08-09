@@ -130,8 +130,8 @@ _camera_mode() {
   local \
     _cmd="${1}" \
     _duration="${2}" \
-    _duration="${3}" \
-    _app="${4}" \
+    _app="${3}" \
+    _poll="${4}" \
     _opts=() \
     _conf
   shift \
