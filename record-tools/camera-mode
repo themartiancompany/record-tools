@@ -27,6 +27,7 @@ _requirements() {
 
 # shellcheck disable=SC2034
 _global_variables() {
+  mode_date=""
   input_command=""
   mode_duration=""
   poll_interval=""
