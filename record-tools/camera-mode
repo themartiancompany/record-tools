@@ -53,21 +53,19 @@ _disable() {
 
 _start() {
   local \
-    _device="${1}" \
     _cmd=() \
     _set \
     _conf
   _cmd=(
-    "mv"
-    "${_device}.disabled"
-    "${_device}"
+    _service \
+      ""
   )
   _conf="$( \
     _get_conf_path)"
   _write_setting \
     "${_conf}" \
     "camera_mode" \
-    "active"
+    "enabled"
   _set="$( \
     _read_setting \
       "${_conf}" \
@@ -155,6 +153,10 @@ _service() {
       enable || \
     true
   fi
+  _write_setting \
+    "${_conf}" \
+    "camera_mode" \
+    "disabled"
 }
 
 _auto_detect_method() {
