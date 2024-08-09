@@ -66,8 +66,7 @@ _start() {
     _get_conf_path)"
   _write_setting \
     "${_conf}" \
-    "camera" \
-    "mode" \
+    "camera_mode" \
     "active"
   _set="$( \
     _read_setting \
