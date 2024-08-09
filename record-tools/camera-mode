@@ -55,6 +55,7 @@ _start() {
   local \
     _device="${1}" \
     _cmd=() \
+    _set \
     _conf
   _cmd=(
     "mv"
@@ -73,6 +74,8 @@ _start() {
       "${_conf}" \
       "camera" \
       "mode")"
+  _msg_info \
+    "set 'camera mode' '${_set}' onto ${_conf}"
   # su \
   #   -c \
   #   "${_cmd[*]}"
