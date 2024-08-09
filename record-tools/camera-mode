@@ -150,8 +150,8 @@ _camera_mode() {
   # 'net.sourceforge.opencamera' 'MainActivity'
   "_${_cmd}" \
     "${_duration}" \
-    "${_app}" \
     "${_poll}" \
+    "${_app}" \
     "${_opts[*]}"
 }
 
