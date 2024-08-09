@@ -54,15 +54,28 @@ _disable() {
 _start() {
   local \
     _device="${1}" \
-    _cmd=()
+    _cmd=() \
+    _conf
   _cmd=(
     "mv"
     "${_device}.disabled"
     "${_device}"
   )
-  su \
-    -c \
-    "${_cmd[*]}"
+  _conf="$( \
+    _get_conf_path)"
+  write_setting \
+    "${_conf}" \
+    "camera" \
+    "mode" \
+    "active"
+  _set="$( \
+    read_setting \
+      "${_conf}" \
+      "camera" \
+      "mode")"
+  # su \
+  #   -c \
+  #   "${_cmd[*]}"
 }
 
 _status() {
@@ -172,6 +185,7 @@ _camera_mode() {
     _duration="${2}" \
     _app="${3}" \
     _poll="${4}" \
+    _cmd_opts=() \
     _opts=() \
     _conf
   shift \
@@ -187,10 +201,15 @@ _camera_mode() {
   #       "${_host}" \
   #       "port")"
   # 'net.sourceforge.opencamera' 'MainActivity'
+  if [[ "${_cmd}" == "service" ]]; then
+    _cmd_opts+=(
+      "${_duration}"
+      "${_poll}"
+      "${_app}"
+    )
+  fi
   "_${_cmd}" \
-    "${_duration}" \
-    "${_poll}" \
-    "${_app}" \
+    "${_cmd_opts[@]}" \
     "${_opts[*]}"
 }
 
