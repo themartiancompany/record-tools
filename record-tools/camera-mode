@@ -210,6 +210,10 @@ _get_conf_path() {
 _set_overrides() {
   _set_override \
     "mode" \
+    "date" \
+    "$(_get_date_human)"
+  _set_override \
+    "mode" \
     "duration" \
     "$(( 60 * 60 * 24 ))"
   _set_override \
