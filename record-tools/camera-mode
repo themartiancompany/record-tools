@@ -71,8 +71,7 @@ _start() {
   _set="$( \
     _read_setting \
       "${_conf}" \
-      "camera" \
-      "mode")"
+      "camera_mode")"
   _msg_info \
     "set 'camera mode' '${_set}' onto ${_conf}"
   # su \
