@@ -232,7 +232,7 @@ _get_conf_path() {
   local \
     _dir \
     _conf
-  _dir="${HOME}/.config/media-tools"
+  _dir="${HOME}/.config/record-tools"
   _conf="${_dir}/$( \
     _get \
       "app" \
@@ -363,7 +363,7 @@ _set \
   "${1}"
 _set_overrides
 _config_user_init \
-  "record-media-tools"
+  "record-tools"
 app_opts=(
   "$(_get \
        "input" \
