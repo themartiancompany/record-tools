@@ -88,10 +88,21 @@ _service() {
     _duration="${1}" \
     _poll="${2}" \
     _app="${3}" \
+    _app_opts=() \
+    _touchctl_opts=() \
     _time=0
+  if [[ "quiet" != "y" ]]; then
+    _touchctl_opts+=(
+      -v
+    )
+    _app_opts+=(
+      -v
+    )
+  fi
   while \
     (( "${_time}" < "${_duration}" )); do
     activity-launch \
+      "${_app_opts[@]}" \
       "${_app}" \
       "MainActivity" || \
       true
@@ -102,6 +113,7 @@ _service() {
         0 || \
       true
     touchctl \
+      "${_touchctl_opts[@]}" \
       disable || \
     true
     sleep \
