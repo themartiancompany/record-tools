@@ -81,9 +81,6 @@ _start() {
 
 _status() {
   local \
-    _duration="${1}" \
-    _poll="${2}" \
-    _app="${3}" \
     _status \
     _conf
   _conf="$( \
