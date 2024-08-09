@@ -205,6 +205,15 @@ _set_overrides() {
   fi
 }
 
+# Shows configuration options.
+_show_config() {
+  _msg_info "${app_name} configuration"
+  _msg_info "         Mode change date:   $(_get "mode" "date")"
+  _msg_info "            Poll interval:   $(_get "poll" "interval")"
+  _msg_info "      Camera app interval:   $(_get "camera" "app")"
+  _msg_info "            Mode duration:   $(_get "mode" "duration")"
+}
+
 # Show help usage, with an exit status.
 # $1: exit status number.
 _usage() {
@@ -287,7 +296,8 @@ _set \
   "${1}"
 _set_overrides
 _config_user_init \
-  "media-tools"
+  "record-media-tools"
+_show_config
 _camera_mode \
   "$(_get \
        "mode" \
