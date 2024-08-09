@@ -52,12 +52,17 @@ _stop() {
 
 _start() {
   local \
+    _duration="${1}" \
+    _poll="${2}" \
+    _app="${3}" \
     _cmd=() \
     _set \
     _conf
   _cmd=(
     _service \
-      ""
+      "${_duration}" \
+      "${_poll}" \
+      "${_app}"
   )
   _conf="$( \
     _get_conf_path)"
@@ -74,6 +79,7 @@ _start() {
   # su \
   #   -c \
   #   "${_cmd[*]}"
+  "${_cmd[*]}"
 }
 
 _status() {
@@ -205,6 +211,12 @@ _camera_mode() {
   #       "port")"
   # 'net.sourceforge.opencamera' 'MainActivity'
   if [[ "${_cmd}" == "service" ]]; then
+    _cmd_opts+=(
+      "${_duration}"
+      "${_poll}"
+      "${_app}"
+    )
+  elif [[ "${_cmd}" == "start" ]]; then
     _cmd_opts+=(
       "${_duration}"
       "${_poll}"
