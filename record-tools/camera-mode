@@ -36,9 +36,8 @@ _global_variables() {
   quiet=""
 }
 
-_disable() {
+_stop() {
   local \
-    _duration="${1}" \
     _app="${2}"
     _cmd=()
   _cmd=(
@@ -99,7 +98,11 @@ _service() {
     _camera_app_opts=() \
     _touchctl_opts=() \
     _time=0 \
-    _brightness
+    _current_brightness \
+    _conf \
+    _touch_status
+  _conf="$( \
+    _get_conf_path)"
   if [[ "quiet" != "y" ]]; then
     _touchctl_opts+=(
       -v
@@ -110,16 +113,19 @@ _service() {
   fi
   while \
     (( "${_time}" < "${_duration}" )); do
-    _brightness="$( \
+    _current_brightness="$( \
       bbrightnessctl \
         -m \
           root \
         get || \
         true)"
+    _touch_status="$( \
+      touchctl \
+        status)"
     _msg_info \
       "Current brightness: ${_brightness}"
     if \
-      (( "1" <= "${_brightness}" )); then
+      (( "1" <= "${_current_brightness}" )); then
       activity-launch \
         "${_camera_app_opts[@]}" \
         "${_app}" \
@@ -132,9 +138,7 @@ _service() {
           0 || \
         true
     fi
-    if \
-      [[ "$(touchctl \
-              status)" == "enabled" ]]; then
+    if [[ "${_touch_status}" == "enabled" ]]; then
       touchctl \
         "${_touchctl_opts[@]}" \
         disable || \
