@@ -286,7 +286,7 @@ shift \
   $(( \
     OPTIND - 1 \
   ))
-(( $# <= 1 )) && \
+(( $# < 1 )) && \
   _set_overrides && \
   _usage \
     1
