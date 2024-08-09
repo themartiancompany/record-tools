@@ -110,7 +110,8 @@ _service() {
     _time=0 \
     _current_brightness \
     _conf \
-    _touch_status
+    _touch_status \
+    _current_activity
   _conf="$( \
     _get_conf_path)"
   if [[ "quiet" != "y" ]]; then
@@ -132,8 +133,16 @@ _service() {
     _touch_status="$( \
       touchctl \
         status)"
+    _current_activity="$( \
+      activity-focused)"
     _msg_info \
       "Current brightness: ${_current_brightness}"
+    _msg_info \
+      "Current activity: ${_current_brightness}"
+    if [[ "${_current_activity}" != "${_app}/MainActivity" ]]; then
+      echo \
+        "${_current_activity}"
+    fi
     if \
       (( "1" <= "${_current_brightness}" )); then
       activity-launch \
