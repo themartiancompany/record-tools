@@ -54,7 +54,6 @@ _start() {
   local \
     _device="${1}" \
     _cmd=()
-
   _cmd=(
     "mv"
     "${_device}.disabled"
@@ -209,6 +208,7 @@ _set_overrides() {
 _show_config() {
   _msg_info "${app_name} configuration"
   _msg_info "         Mode change date:   $(_get "mode" "date")"
+  _msg_info "            Input command:   $(_get "input" "command")"
   _msg_info "            Poll interval:   $(_get "poll" "interval")"
   _msg_info "      Camera app interval:   $(_get "camera" "app")"
   _msg_info "            Mode duration:   $(_get "mode" "duration")"
@@ -233,7 +233,7 @@ Usage:
     [options]
     <command>
   commands:
-    enable
+    start
     disable
     status
   options:
@@ -297,13 +297,22 @@ _set \
 _set_overrides
 _config_user_init \
   "record-media-tools"
-_show_config
-_camera_mode \
+app_opts=(
+  "$(_get \
+       "input" \
+       "command")"
   "$(_get \
        "mode" \
-       "duration")" \
+       "duration")"
   "$(_get \
        "camera" \
        "app")"
+  "$(_get \
+       "poll" \
+       "interval")"
+)
+_show_config
+_camera_mode \
+  "${app_opts[@]}"
 
 # vim:set sw=2 sts=-1 et:
