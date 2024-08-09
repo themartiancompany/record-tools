@@ -124,15 +124,27 @@ _service() {
           0 || \
         true
     fi
-    touchctl \
-      "${_touchctl_opts[@]}" \
-      disable || \
-    true
+    if \
+      [[ "$(touchctl \
+              status)" == "enabled" ]]; then
+      touchctl \
+        "${_touchctl_opts[@]}" \
+        disable || \
+      true
+    fi
     sleep \
       "${_poll}"
     _time="$(( \
       _time + _poll ))"
   done
+  if \
+    [[ "$(touchctl \
+            status)" == "disabled" ]]; then
+    touchctl \
+      "${_touchctl_opts[@]}" \
+      enable || \
+    true
+  fi
 }
 
 _auto_detect_method() {
@@ -215,7 +227,8 @@ _set_overrides() {
   _set_override \
     "mode" \
     "duration" \
-    "$(( 60 * 60 * 24 ))"
+    "$(( 60 * 60 ))" # 1 hour
+    # "$(( 60 * 60 * 24 ))" # 24 hours
   _set_override \
     "camera" \
     "app" \
