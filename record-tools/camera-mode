@@ -29,6 +29,7 @@ _requirements() {
 _global_variables() {
   input_command=""
   mode_duration=""
+  poll_interval=""
   camera_app=""
   color=""
   quiet=""
@@ -141,13 +142,12 @@ _camera_mode() {
   )
   _conf="$( \
     _get_conf_path)"
-  _a="$( \
-      _read_settings \
-        "${_conf}" \
-        "${_host}" \
-        "port")"
-
-  'net.sourceforge.opencamera' 'MainActivity'
+  # _a="$( \
+  #     _read_settings \
+  #       "${_conf}" \
+  #       "${_host}" \
+  #       "port")"
+  # 'net.sourceforge.opencamera' 'MainActivity'
   "_${_cmd}" \
     "${_duration}" \
     "${_app}" \
@@ -189,6 +189,10 @@ _set_overrides() {
     "camera" \
     "app" \
     "$(_camera_app_auto_detect)"
+  _set_override \
+    "poll" \
+    "interval" \
+    "30"
   if [[ -v override_color ]]; then
     color="${override_color}"
   elif [[ -z "${color}" ]]; then
@@ -228,6 +232,9 @@ Usage:
 			  Default: $(_get "mode" "duration")
      -a                   Camera app.
 			  Default: $(_get "camera" "app")
+     -p                   Poll interval for brightness reset
+                          in seconds.
+			  Default: $(_get "poll" "interval")
      -h                   This message.
      -v                   Enable verbose output
 ENDUSAGETEXT
@@ -244,12 +251,13 @@ _global_variables
 # shellcheck disable=SC2034
 while \
   getopts \
-    't:a:cvh?' \
+    't:a:p:cvh?' \
     arg; do
   case \
     "${arg}" in
     t) override_mode_duration="${OPTARG}" ;;
     a) override_camera_app="${OPTARG}" ;;
+    p) override_poll_interval="${OPTARG}" ;;
     c) override_color="y" ;;
     v) override_quiet="n" ;;
     h|?) _set_overrides && \
