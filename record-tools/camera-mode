@@ -83,8 +83,6 @@ _status() {
     "${_status}"
 }
 
-
-
 _service() {
   local \
     _duration="${1}" \
@@ -112,23 +110,26 @@ _service() {
         true)"
     _msg_info \
       "Current brightness: ${_brightness}"
-    activity-launch \
-      "${_camera_app_opts[@]}" \
-      "${_app}" \
-      "MainActivity" || \
-      true
-    bbrightnessctl \
-      -m \
-        root \
-      set \
-        0 || \
-      true
+    if \
+      (( "1" <= "${_brightness}" )); then
+      activity-launch \
+        "${_camera_app_opts[@]}" \
+        "${_app}" \
+        "MainActivity" || \
+        true
+      bbrightnessctl \
+        -m \
+          root \
+        set \
+          0 || \
+        true
+    fi
     touchctl \
       "${_touchctl_opts[@]}" \
       disable || \
     true
     sleep \
-      "${_poll}"
+    ž  "${_poll}"
     _time="$(( \
       _time + _poll ))"
   done
