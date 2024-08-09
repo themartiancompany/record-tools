@@ -127,6 +127,17 @@ _service() {
       -v
     )
   fi
+  _touch_status="$( \
+    touchctl \
+      status)"
+  if [[ "${_touch_status}" == "enabled" ]]; then
+    _msg_info \
+      "Disabling touch input"
+    touchctl \
+      "${_touchctl_opts[@]}" \
+      disable || \
+    true
+  fi
   while \
     (( "${_time}" < "${_duration}" )); do
     _current_brightness="$( \
@@ -136,18 +147,13 @@ _service() {
           root \
         get || \
         true)"
-    _touch_status="$( \
-      touchctl \
-        status)"
     _current_activity="$( \
       activity-focused)"
-    _msg_info \
-      "Current brightness: ${_current_brightness}"
-    _msg_info \
-      "Current activity: ${_current_activity}"
-    _msg_info \
-      "Target activity: ${_app}/${_app}.MainActivity"
     if [[ "${_current_activity}" != "${_app}/${_app}.MainActivity" ]]; then
+      _msg_info \
+        "Current activity: ${_current_activity}"
+      _msg_info \
+        "Target activity: ${_app}/${_app}.MainActivity"
       activity-launch \
         "${_camera_app_opts[@]}" \
         "${_app}" \
@@ -156,6 +162,8 @@ _service() {
     fi
     if \
       (( "1" <= "${_current_brightness}" )); then
+      _msg_info \
+        "Current brightness: ${_current_brightness}"
       bbrightnessctl \
         -m \
           root \
@@ -163,20 +171,18 @@ _service() {
           0 || \
         true
     fi
-    if [[ "${_touch_status}" == "enabled" ]]; then
-      touchctl \
-        "${_touchctl_opts[@]}" \
-        disable || \
-      true
-    fi
     sleep \
       "${_poll}"
     _time="$(( \
       _time + _poll ))"
   done
+  _touch_status="$( \
+    touchctl \
+      status)"
   if \
-    [[ "$(touchctl \
-            status)" == "disabled" ]]; then
+    [[ "${_touch_status}" == "disabled" ]]; then
+    _msg_info \
+      "Enabling touch input"
     touchctl \
       "${_touchctl_opts[@]}" \
       enable || \
