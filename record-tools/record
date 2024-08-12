@@ -154,10 +154,10 @@ _record() {
       "sync" \
       "${_recorder}" \
         "${_recorder_opts[@]}" \
-        "${_out_dir}/${_out}-${_i}.mp4" || \
+        "${_out}-${_i}.mp4" || \
       true
     _vids+=(
-      "${_out_dir}/${_out}-${_i}.mp4"
+      "${_out}-${_i}.mp4"
     )
     _i="$(( \
       _i + 1))"
