@@ -114,7 +114,7 @@ _record() {
     _recorder \
     _tmp_dir \
     _chunks \
-    _i=0 \
+    _i=1 \
     _vids=()
   if [[ "${quiet}" != "y" ]]; then
     _recorder_opts+=(
@@ -143,7 +143,7 @@ _record() {
   _chunks="$(( \
     _length / _buffer ))"
   while \
-    (( _i < _chunks )); do
+    (( _i < _chunks + 1 )); do
     _run \
       "record_${_i}" \
       "0" \
