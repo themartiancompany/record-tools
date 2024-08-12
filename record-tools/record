@@ -117,9 +117,13 @@ _record() {
     _i=0 \
     _vids=()
   if [[ "${quiet}" != "y" ]]; then
+    _recorder_opts+=(
+      -v
+    )
     _vidcat_opts+=(
       -v
     )
+
   fi
   if [[ "${_method}" == "auto" ]]; then
     _method="$( \
