@@ -30,6 +30,7 @@ _global_variables() {
   buffer_length=""
   recording_length=""
   scale_factor=""
+  cat_delay=""
   color=""
   quiet=""
 }
@@ -110,7 +111,7 @@ _record() {
     _out="${7}" \
     _recorder_opts=() \
     _vidcat_opts=() \
-    _recorder=() \
+    _recorder \
     _tmp_dir \
     _chunks \
     _i=0 \
@@ -143,7 +144,7 @@ _record() {
       "record_${_i}" \
       "0" \
       "sync" \
-      "${_recorder[@]}" \
+      "${_recorder}" \
         "${_recorder_opts[@]}" \
         "${_tmp_dir}/${_i}.mp4" || \
       true
@@ -166,14 +167,6 @@ _record() {
 # from program command line option parameters
 _set_overrides() {
   _set_override \
-    "audio" \
-    "record" \
-    "auto"
-  _set_override \
-    "recording" \
-    "format" \
-    "mp4"
-  _set_override \
     "recording" \
     "date" \
     "$(_get_date_human)"
@@ -182,20 +175,10 @@ _set_overrides() {
     "method" \
     "$(_method_auto_detect)"
   _set_override \
-    "out" \
-    "file" \
-    "$( \
-      realpath \
-        "recording_$( \
-	  _get \
-            "recording" \
-	    "date").$(_get \
-                        "recording" \
-		        "format")")"
-  _set_override \
     "bit" \
     "rate" \
-    "16000000" # 16 Mb?
+    "160000" # 160 Kbs mm
+    # "16000000" # 16 Mb? Pfffff
   _set_override \
     "buffer" \
     "length" \
@@ -203,19 +186,15 @@ _set_overrides() {
   _set_override \
     "recording" \
     "length" \
-    "120" # "$(( 24 * 60 * 60 ))" # 24 hours
+    "300" # "$(( 24 * 60 * 60 ))" # 24 hours
   _set_override \
     "scale" \
     "factor" \
     "1"
   _set_override \
-    "out" \
-    "stdout" \
-    "n"
-  _set_override \
-    "encoding" \
+    "cat" \
     "delay" \
-    "20"
+    "0" # + 2
   if [[ -v override_color ]]; then
     color="${override_color}"
   elif [[ -z "${color}" ]]; then
@@ -232,12 +211,10 @@ _set_overrides() {
 _show_config() {
   _msg_info "${app_name} configuration"
   _msg_info "           Recording date:   $(_get "recording" "date")"
-  _msg_info "         Recording format:   $(_get "recording" "format")"
-  _msg_info "             Audio record:   $(_get "audio" "record")"
   _msg_info "         Recording method:   $(_get "recording" "method")"
   _msg_info "                 Bit rate:   $(_get "bit" "rate")"
   _msg_info "            Buffer length:   $(_get "buffer" "length")"
-  _msg_info "           Encoding delay:   $(_get "encoding" "delay")"
+  _msg_info "           Encoding delay:   $(_get "cat" "delay")"
   _msg_info "         Recording length:   $(_get "recording" "length")"
   _msg_info "              Output file:   $(_get "out" "file")"
 }
@@ -262,21 +239,18 @@ Usage:
     [options]
     (<out_file>)
   options:
-     -f                   Recording format
-                          Default: $(_get "recording" "format")
      -m                   Recording method
                           Default: $(_get "recording" "method")
-     -a                   Whether to record audio from the microphone.
-                          Default: $(_get "audio" "record").
      -b                   Video bitrate.
                           Default: $(_get "bit" "rate").
      -k                   Encoding buffer length.
                           Default: $(_get "buffer" "length").
      -l                   Length of the recording.
                           Default: $(_get "recording" "length").
-     -r                   Scale factor.
+     -r <factor>          Scale factor.
                           Default: $(_get "scale" "factor").
-     -s                   Output to stdout.
+     -e <cat_delay>       Encoding delay.
+                          Default: $(_get "cat" "delay").
      -h                   This message.
      -v                   Enable verbose output
 ENDUSAGETEXT
@@ -294,7 +268,7 @@ _requirements
 # shellcheck disable=SC2034
 while \
   getopts \
-    'f:a:b:k:l:r:scvh?' \
+    'm:b:k:l:r:d:cvh?' \
     arg; do
   case \
     "${arg}" in
@@ -303,6 +277,7 @@ while \
     k) override_buffer_length="${OPTARG}" ;;
     l) override_recording_length="${OPTARG}" ;;
     r) override_scale_factor="${OPTARG}" ;;
+    d) override_cat_delay="${OPTARG}" ;;
     c) override_color="y" ;;
     v) override_quiet="n" ;;
     h|?) _set_overrides && \
