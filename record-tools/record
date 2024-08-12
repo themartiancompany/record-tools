@@ -123,7 +123,7 @@ _record() {
     )
     _vidcat_opts+=(
       -v
-      -m "filter"
+      # -m "filter"
     )
 
   fi
