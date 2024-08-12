@@ -130,7 +130,7 @@ _record() {
       -d)"
   _msg_info \
     "out: ${_out}"
-  if [[ "${_out}" == "" ]] || \
+  if [[ "${_out}" == "" ]]; then
     _msg_error \
       "why no out?" \
       1
