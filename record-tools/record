@@ -17,34 +17,21 @@ source \
 # are available
 _requirements() {
   _check_cmd \
-    'ffmpeg'
+    'android-recorder'
 }
 
 # shellcheck disable=SC2034
 _global_variables() {
   recording_date=""
-  recording_format=""
   recording_method=""
   out_stdout=""
   out_file=""
-  audio_record=""
   bit_rate=""
   buffer_length=""
   recording_length=""
-  encoding_delay=""
   scale_factor=""
   color=""
   quiet=""
-}
-
-_ffmpeg_options_load() {
-  local \
-    ffmpeg_options
-  ffmpeg_options="${HOME}/.config/media-tools/ffmpeg_options"
-  [ -e "${ffmpeg_options}" ] && \
-    source \
-      "${ffmpeg_options}" || \
-  true
 }
 
 _encode() {
@@ -52,8 +39,6 @@ _encode() {
     _in="${1}" \
     _out="${2}" \
     _scale="${3}" \
-    _audio="${4}" \
-    _delay="${5}" \
     _mkmedia_opts=() \
     _ytencode_opts=() \
     _scaled \
@@ -67,8 +52,6 @@ _encode() {
     -m
       "fake"
   )
-  sleep \
-    "${_delay}"
   _msg_info \
     "encoding ${_in}"
   if [[ "${_scale}" != "1" ]]; then
@@ -84,18 +67,6 @@ _encode() {
       "${_in}"
     _in="${_scaled}"
   fi
-  if [[ "${_audio}" != "" ]]; then
-    _audiovideo="$( \
-      mktemp).mp4"
-    mkmedia \
-      "${_mkmedia_opts[@]}" \
-      "${_audiovideo}" \
-      "${_audio}" \
-      "${_in}"
-    rm \
-      "${_in}"
-    _in="${_audiovideo}"
-  fi
   ytencode \
     "${_ytencode_opts[@]}" \
     "${_in}" \
@@ -107,142 +78,86 @@ _encode() {
 _method_auto_detect() {
   if [[ "$(uname -o)" == "Android" ]]; then
     echo \
-      'root'
+      'android-recorder'
   fi
 }
 
-_audio_auto_detect() {
-  if [[ "$(uname -o)" == "Android" ]]; then
-    _audiorecord_opts+=(
-      -m
-        'termux'
-    )
-  fi
-  _audiorecord_opts+=(
-    -k
-      "${_buffer}"
+_android-recorder_opts(){
+  _recorder="android-recorder"
+  _recorder_opts+=(
     -l
       "${_buffer}"
-  )
-  _audio="true"
-}
-
-_root_screenrecord(){
-  _screenrecord="/system/bin/screenrecord"
-  _screenrecord_opts+=(
-    --bit-rate
+    -b
       "${_rate}"
   )
 }
 
-# Record screen
+# Record
 # $1: input video file
-# $2: recording method (root)
-# $2: delay seconds
+# $2: recording method (android-recorder)
+# $3: recording bit rate
+# $4: recording buffer (180)
+# $5: recording length
 # $3: output video file
 _record() {
   local \
-    _format="${1}" \
-    _method="${2}" \
-    _audio="${3}" \
-    _rate="${4}" \
-    _buffer="${5}" \
-    _length="${6}" \
-    _scale="${7}" \
-    _delay="${8}" \
-    _out=(
-      "${9}"
-    ) \
-    _screenrecord_opts=() \
-    _screenrecord \
-    _audiorecord_opts=() \
-    _audio_file \
+    _method="${1}" \
+    _rate="${2}" \
+    _buffer="${3}" \
+    _length="${4}" \
+    _scale="${5}" \
+    _delay="${6}" \
+    _out="${7}" \
+    _recorder_opts=() \
+    _vidcat_opts=() \
+    _recorder=() \
     _tmp_dir \
-    _tmp \
     _chunks \
     _i=0 \
     _vids=()
+  if [[ "${quiet}" != "y" ]]; then
+    _vidcat_opts+=(
+      -v
+    )
+  fi
   if [[ "${_method}" == "auto" ]]; then
     _method="$( \
       _method_auto_detect)"
   fi
-  if [[ "${_audio}" == "auto" ]]; then
-    if [[ "${quiet}" != "y" ]]; then
-      _audiorecord_opts+=(
-        -v
-      )
-    fi
-    _audio_auto_detect
-  fi
-  "_${_method}_screenrecord"
+  "_${_method}_opts"
   _tmp_dir="$( \
     mktemp \
       -d)"
   _msg_info \
-    "out: ${_out[*]}"
-  if [[ "${_out[*]}" == "" ]] || \
-     [[ "$(_get \
-             "out" \
-	     "stdout")" == "y" ]]; then
-    _out+=(
-      -
-    )
+    "out: ${_out}"
+  if [[ "${_out}" == "" ]] || \
+    _msg_error \
+      "why no out?" \
+      1
   fi
   _chunks="$(( \
     _length / _buffer ))"
   while \
     (( _i < _chunks )); do
-    _audio_file=""
-    if [[ "${_audio}" == "true" ]]; then
-      _audio_file="${_tmp_dir}/${_i}.opus"
-      _run \
-        "audiorecord_${_i}" \
-        "0" \
-        "async" \
-        "audiorecord" \
-          "${_audiorecord_opts[@]}" \
-          "${_audio_file}" || \
-	true
-    fi
     _run \
       "record_${_i}" \
-      "${_buffer}" \
-      "sync" \
-      "${_screenrecord}" \
-        "${_screenrecord_opts[@]}" \
-        "${_tmp_dir}/${_i}.hq.mp4" || \
-      true
-    _run \
-      "encode_${_i}" \
       "0" \
-      "async" \
-      _encode \
-        "${_tmp_dir}/${_i}.hq.mp4" \
-        "${_tmp_dir}/${_i}.${_format}" \
-	"${_scale}" \
-        "${_audio_file}" \
-	"${_delay}" || \
+      "sync" \
+      "${_recorder[@]}" \
+        "${_recorder_opts[@]}" \
+        "${_tmp_dir}/${_i}.mp4" || \
       true
     _vids+=(
-      "${_tmp_dir}/${_i}.${_format}"
+      "${_tmp_dir}/${_i}.mp4"
     )
     _i="$(( \
       _i + 1))"
   done
-  _i=0
-  while \
-    (( _i < _chunks )); do
-    wait \
-      "$( \
-        _get_pid \
-	"encode_${_i}")"
-    _i="$(( \
-      _i + 1))"
-  done 
   sleep \
     "$(( \
       _delay + 2))"
   vidcat \
+    "${_vidcat_opts[@]}" \
     "${_out}" \
     "${_vids[@]}"
 }
@@ -265,7 +180,7 @@ _set_overrides() {
   _set_override \
     "recording" \
     "method" \
-    "auto"
+    "$(_method_auto_detect)"
   _set_override \
     "out" \
     "file" \
@@ -383,14 +298,11 @@ while \
     arg; do
   case \
     "${arg}" in
-    f) override_recording_format="${OPTARG}" ;;
     m) override_recording_method="${OPTARG}" ;;
-    a) override_audio_record="${OPTARG}" ;;
     b) override_bit_rate="${OPTARG}" ;;
     k) override_buffer_length="${OPTARG}" ;;
     l) override_recording_length="${OPTARG}" ;;
     r) override_scale_factor="${OPTARG}" ;;
-    s) override_out_stdout="y" ;;
     c) override_color="y" ;;
     v) override_quiet="n" ;;
     h|?) _set_overrides && \
@@ -413,16 +325,17 @@ shift \
 (( $# == 1 )) && \
   out_file="${1}"
 _set_overrides
+app_opts=(
+  "${recording_method}"
+  "${bit_rate}"
+  "${buffer_length}"
+  "${recording_length}"
+  "${scale_factor}"
+  "${cat_delay}"
+  "${out_file}"
+)
 _config_user_init \
-  "media-tools"
+  "record-tools"
 _show_config
 _record \
-  "${recording_format}" \
-  "${recording_method}" \
-  "${audio_record}" \
-  "${bit_rate}" \
-  "${buffer_length}" \
-  "${recording_length}" \
-  "${scale_factor}" \
-  "${encoding_delay}" \
-  "${out_file}"
+  "${app_opts[@]}"
