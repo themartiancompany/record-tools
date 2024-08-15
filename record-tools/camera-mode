@@ -100,6 +100,38 @@ _status() {
     "${_status}"
 }
 
+_activity_check() {
+  local
+    _current_activity="${1}"
+  if [[ "${_current_activity}" != "${_app}/${_app}.MainActivity" ]]; then
+    _msg_info \
+      "Current activity: ${_current_activity}"
+    _msg_info \
+      "Target activity: ${_app}/${_app}.MainActivity"
+    activity-launch \
+      "${_camera_app_opts[@]}" \
+      "${_app}" \
+      "MainActivity" || \
+      true
+  fi
+} 
+
+_brightness_check() {
+  local \
+    _current_brightness="${1}"
+  if \
+    (( "1" <= "${_current_brightness}" )); then
+    _msg_info \
+      "Current brightness: ${_current_brightness}"
+    bbrightnessctl \
+      -m \
+        root \
+      set \
+        0 || \
+      true
+  fi
+}
+
 _service() {
   local \
     _duration="${1}" \
@@ -113,9 +145,11 @@ _service() {
     _current_brightness \
     _conf \
     _touch_status \
-    _current_activity
+    _old_activity
   _conf="$( \
     _get_conf_path)"
+  _old_activity="$( \
+    activity-focused)"
   if [[ "quiet" != "y" ]]; then
     _bbrightnessctl_opts+=(
       -v
@@ -149,28 +183,10 @@ _service() {
         true)"
     _current_activity="$( \
       activity-focused)"
-    if [[ "${_current_activity}" != "${_app}/${_app}.MainActivity" ]]; then
-      _msg_info \
-        "Current activity: ${_current_activity}"
-      _msg_info \
-        "Target activity: ${_app}/${_app}.MainActivity"
-      activity-launch \
-        "${_camera_app_opts[@]}" \
-        "${_app}" \
-        "MainActivity" || \
-        true
-    fi
-    if \
-      (( "1" <= "${_current_brightness}" )); then
-      _msg_info \
-        "Current brightness: ${_current_brightness}"
-      bbrightnessctl \
-        -m \
-          root \
-        set \
-          0 || \
-        true
-    fi
+    _activity_check \
+      "${_current_activity}"
+    _brightness_check \
+      "${_current_brightness}"
     sleep \
       "${_poll}"
     _time="$(( \
@@ -188,6 +204,10 @@ _service() {
       enable || \
     true
   fi
+  activity-launch \
+    "${_old_activity}" \
+    "${_old_activity}" || \
+      true
   _write_setting \
     "${_conf}" \
     "camera_mode" \
