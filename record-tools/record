@@ -17,7 +17,11 @@ source \
 # are available
 _requirements() {
   _check_cmd \
+    'android-recorder' \
     'android-recorder'
+  _check_cmd \
+    'sdk-version' \
+    'android-utils'
 }
 
 # shellcheck disable=SC2034
@@ -174,6 +178,18 @@ _record() {
     "${_vids[@]}"
 }
 
+_buffer_auto_detect() {
+  _sdk="$( \
+    sdk-version)"
+  if (( "${_sdk}" < 28 )); then
+    echo \
+      "180"
+    else
+    echo \
+      "300"
+    fi
+}
+
 # Set defaults and, if present, overrides
 # from program command line option parameters
 _set_overrides() {
@@ -193,11 +209,11 @@ _set_overrides() {
   _set_override \
     "buffer" \
     "length" \
-    "60" # 60 seconds
+    "$(_buffer_auto_detect)"
   _set_override \
     "recording" \
     "length" \
-    "300" # "$(( 24 * 60 * 60 ))" # 24 hours
+    "$(( 10 * 60))" # "$(( 24 * 60 * 60 ))" # 24 hours
   _set_override \
     "scale" \
     "factor" \
