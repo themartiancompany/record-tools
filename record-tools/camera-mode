@@ -44,14 +44,14 @@ _stop() {
   local \
     _app="${2}"
     _cmd=()
-  _cmd=(
-    "mv"
-    "${_device}"
-    "${_device}.disabled"
-  )
-  su \
-    -c \
-    "${_cmd[*]}"
+  # _cmd=(
+  #   "mv"
+  #   "${_device}"
+  #   "${_device}.disabled"
+  # )
+  # su \
+  #   -c \
+  #   "${_cmd[*]}"
 }
 
 _start() {
@@ -204,10 +204,10 @@ _service() {
       enable || \
     true
   fi
-  activity-launch \
-    "${_old_activity}" \
-    "${_old_activity}" || \
-      true
+  # activity-launch \
+  #   "${_old_activity}" \
+  #   "${_old_activity}" || \
+  #     true
   _write_setting \
     "${_conf}" \
     "camera_mode" \
