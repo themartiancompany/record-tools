@@ -90,7 +90,7 @@ _method_auto_detect() {
 _android-recorder_opts(){
   _recorder="android-recorder"
   _recorder_opts+=(
-    -l
+    -L
       "${_buffer}"
     -b
       "${_rate}"
@@ -295,14 +295,14 @@ _requirements
 # shellcheck disable=SC2034
 while \
   getopts \
-    'm:b:k:l:r:d:cvh?' \
+    'm:b:k:L:r:d:cvh?' \
     arg; do
   case \
     "${arg}" in
     m) override_recording_method="${OPTARG}" ;;
     b) override_bit_rate="${OPTARG}" ;;
     k) override_buffer_length="${OPTARG}" ;;
-    l) override_recording_length="${OPTARG}" ;;
+    L) override_recording_length="${OPTARG}" ;;
     r) override_scale_factor="${OPTARG}" ;;
     d) override_cat_delay="${OPTARG}" ;;
     c) override_color="y" ;;

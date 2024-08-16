@@ -24,8 +24,6 @@ install-doc:
 install-scripts:
 
 	install -vdm 755 "$(BIN_DIR)"
-	install -vDm 755 record-tools/audiorecord "$(BIN_DIR)"
-	install -vDm 755 record-tools/camera-mode "$(BIN_DIR)"
 	install -vDm 755 record-tools/record "$(BIN_DIR)"
 
 install-configs:
