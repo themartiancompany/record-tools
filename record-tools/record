@@ -157,7 +157,7 @@ _record() {
     _run \
       "record_${_i}" \
       "0" \
-      "async" \
+      "sync" \
       "${_recorder}" \
         "${_recorder_opts[@]}" \
         "${_out}-${_i}.mp4" || \
@@ -173,8 +173,8 @@ _record() {
     sleep \
       "${_buffer}"
   done
-  wait \
-    "${_pids[@]}"
+  # wait \
+  #   "${_pids[@]}"
   sleep \
     "$(( \
       _delay + 2))"
