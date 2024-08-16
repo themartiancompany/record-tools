@@ -120,7 +120,8 @@ _record() {
     _tmp_dir \
     _chunks \
     _i=1 \
-    _vids=()
+    _vids=() \
+    _pids=()
   if [[ "${quiet}" != "y" ]]; then
     _recorder_opts+=(
       -v
@@ -156,7 +157,7 @@ _record() {
     _run \
       "record_${_i}" \
       "0" \
-      "sync" \
+      "async" \
       "${_recorder}" \
         "${_recorder_opts[@]}" \
         "${_out}-${_i}.mp4" || \
@@ -164,9 +165,16 @@ _record() {
     _vids+=(
       "${_out}-${_i}.mp4"
     )
+    _pids+=(
+      "$(_get_pid "record_${i}")"
+    )
     _i="$(( \
       _i + 1))"
+    sleep \
+      "${_buffer}"
   done
+  wait \
+    "${_pids[@]}"
   sleep \
     "$(( \
       _delay + 2))"
