@@ -92,6 +92,8 @@ _android-recorder_opts(){
   _recorder_opts+=(
     -L
       "${_buffer}"
+    -k
+      "${_buffer}"
     -b
       "${_rate}"
   )
@@ -130,7 +132,6 @@ _record() {
       -v
       # -m "filter"
     )
-
   fi
   if [[ "${_method}" == "auto" ]]; then
     _method="$( \
@@ -166,7 +167,7 @@ _record() {
       "${_out}-${_i}.mp4"
     )
     _pids+=(
-      "$(_get_pid "record_${i}")"
+      "$(_get_pid "record_${_i}")"
     )
     _i="$(( \
       _i + 1))"
