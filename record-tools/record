@@ -161,10 +161,10 @@ _record() {
       "sync" \
       "${_recorder}" \
         "${_recorder_opts[@]}" \
-        "${_out}-${_i}.mp4" || \
+        "${_out}.${_i}.mp4" || \
       true
     _vids+=(
-      "${_out}-${_i}.mp4"
+      "${_out}.${_i}.mp4"
     )
     _pids+=(
       "$(_get_pid "record_${_i}")"
@@ -179,23 +179,29 @@ _record() {
   sleep \
     "$(( \
       _delay + 2))"
-  vidcat \
-    "${_vidcat_opts[@]}" \
-    "${_out}" \
-    "${_vids[@]}"
-  rm \
-    "${_vids[@]}"
+  if (( "${#_vids}" == 1 )); then
+    mv \
+      "${_vids[@]}" \
+      "${_out}"
+  elif (( 1 < "${#_vids}" )); then
+    vidcat \
+      "${_vidcat_opts[@]}" \
+      "${_out}" \
+      "${_vids[@]}"
+    rm \
+      "${_vids[@]}"
+  fi
 }
 
 _buffer_auto_detect() {
   _sdk="$( \
     sdk-version)"
-  if (( "${_sdk}" < 28 )); then
+  if (( "${_sdk}" < 42 )); then
     echo \
       "180"
     else
-    echo \
-      "300"
+      echo \
+        "180"
     fi
 }
 
